@@ -11,7 +11,7 @@ from keras.utils import np_utils
 from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
-from keras import backend as K
+from tensorflow.keras import backend as K
 
 batch_size = 100
 nb_classes = 10
