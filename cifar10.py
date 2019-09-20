@@ -6,11 +6,11 @@ import densenet
 import numpy as np
 import sklearn.metrics as metrics
 
-from keras.datasets import cifar10
-from keras.utils import np_utils
-from keras.preprocessing.image import ImageDataGenerator
-from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
+from tensorflow.keras.datasets import cifar10
+from tensorflow.keras import utils
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from tensorflow.keras import backend as K
 
 batch_size = 100
@@ -20,7 +20,7 @@ nb_epoch = 300
 img_rows, img_cols = 32, 32
 img_channels = 3
 
-img_dim = (img_channels, img_rows, img_cols) if K.image_dim_ordering() == "th" else (img_rows, img_cols, img_channels)
+img_dim = (img_rows, img_cols, img_channels)
 depth = 40
 nb_dense_block = 3
 growth_rate = 12
@@ -45,8 +45,8 @@ testX = testX.astype('float32')
 trainX = densenet.preprocess_input(trainX)
 testX = densenet.preprocess_input(testX)
 
-Y_train = np_utils.to_categorical(trainY, nb_classes)
-Y_test = np_utils.to_categorical(testY, nb_classes)
+Y_train = utils.to_categorical(trainY, nb_classes)
+Y_test = utils.to_categorical(testY, nb_classes)
 
 generator = ImageDataGenerator(rotation_range=15,
                                width_shift_range=5./32,
