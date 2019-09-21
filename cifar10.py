@@ -15,7 +15,8 @@ from tensorflow.keras import backend as K
 
 batch_size = 100
 nb_classes = 10
-nb_epoch = 300
+nb_epoch = 200
+learning_rate = 1e-3
 
 img_rows, img_cols = 32, 32
 img_channels = 3
@@ -32,7 +33,7 @@ model = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_blo
 print("Model created")
 
 model.summary()
-optimizer = Adam(lr=1e-3) # Using Adam instead of SGD to speed up training
+optimizer = Adam(lr=learning_rate) # Using Adam instead of SGD to speed up training
 model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=["accuracy"])
 print("Finished compiling")
 print("Building model...")
@@ -68,13 +69,19 @@ lr_reducer      = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1),
 model_checkpoint= ModelCheckpoint(weights_file, monitor="val_acc", save_best_only=True,
                                   save_weights_only=True, verbose=1)
 
-callbacks=[lr_reducer, model_checkpoint]
+callbacks=[model_checkpoint]
 
-model.fit_generator(generator.flow(trainX, Y_train, batch_size=batch_size),
+historytemp = model.fit_generator(generator.flow(trainX, Y_train, batch_size=batch_size),
                     steps_per_epoch=len(trainX) // batch_size, epochs=nb_epoch,
                     callbacks=callbacks,
                     validation_data=(testX, Y_test),
                     validation_steps=testX.shape[0] // batch_size, verbose=1)
+
+np_loss_history = np.array(historytemp.history['loss'])
+np_acc_history = np.array(historytemp.history['val_acc'])
+prefix = 'Dense_data/'
+np.savetxt(prefix+'loss.txt', np_loss_history, delimiter=',')
+np.savetxt(prefix+'acc.txt', np_acc_history, delimiter=',')
 
 yPreds = model.predict(testX)
 yPred = np.argmax(yPreds, axis=1)
